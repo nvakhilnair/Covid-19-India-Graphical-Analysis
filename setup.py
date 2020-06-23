@@ -14,7 +14,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/nvakhilnair/Covid-19-India-Graphical-Analysis",
     author="Akhil",
-    author_email="developmentuse009r@gmail.com",
+    author_email="MadeWithPY009r@gmail.com",
     license="MIT",
     classifiers=[
         "License :: OSI Approved :: MIT License",
