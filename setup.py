@@ -12,7 +12,7 @@ setup(
     description="Gui application is used for Analysis of Covid-19 in India Graphicaly",
     long_description=readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/nvakhilnair/",
+    url="https://github.com/nvakhilnair/Covid-19-India-Graphical-Analysis",
     author="Akhil",
     author_email="developmentuse009r@gmail.com",
     license="MIT",
