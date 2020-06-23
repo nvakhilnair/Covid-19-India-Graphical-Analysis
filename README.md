@@ -9,5 +9,5 @@ or use Requirements.txt file using <pip install -r Requirements.txt>
 
 
 Feedbacks and suggestions for improvement are always welcomed
-email id: developmentuse009@gmail.com 
+email id: MadeWithPY009@gmail.com 
 
