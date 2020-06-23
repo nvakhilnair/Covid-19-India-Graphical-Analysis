@@ -6,10 +6,9 @@ def readme():
 
 
 setup(
-    name="Covid_19_Analysis",
-    version="1.0.0",
-    description="Gui application is used for Analysis of Covid-19 in India Graphical
-    cmd command: Covid_19_Analysis.py",
+    name="covid_19_graphical_analysis",
+    version="1.0.1",
+    description="Gui application is used for Analysis of Covid-19 in India Graphical (cmd command: covid_19_graphical_analysis.py)",
     long_description=readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/nvakhilnair/Covid-19-India-Graphical-Analysis",
@@ -23,8 +22,7 @@ setup(
     ],
     include_package_data=True,
     install_requires=["PyQt4>=4.11.4","pandas>=1.0.3","docutils>=0.3"],
-    scripts=["Covid_19_Analysis.py"],
-    packages=["icon.ico","logo.png"],
-    include_package_data=True,
+    scripts=["covid_19_graphical_analysis.py"],
+    packages=[],
     
 )

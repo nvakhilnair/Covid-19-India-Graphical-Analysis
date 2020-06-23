@@ -1,7 +1,7 @@
 Gui application is used for Analysis of Covid-19 in India Graphical.
 This application lets you get current status,daily analysis of last 15 days and daily test count of India(States and Districs included)
 
-cmd command : Covid_19_Analysis.py (after pip installation the package)
+cmd command : covid_19_graphical_analysis.py (after pip installation the package)
 
 Requirement: PyQt4==4.11.4
 	     pandas==1.0.3
