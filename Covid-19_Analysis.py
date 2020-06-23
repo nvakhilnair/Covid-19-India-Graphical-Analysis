@@ -701,7 +701,7 @@ class Ui_Dialog(QWidget):
         self.comboBox_3.setCurrentIndex(state_names.index('Gujarat'))
         self.comboBox_4.setCurrentIndex(state_names.index('Karnataka'))
         self.comboBox_5.setCurrentIndex(district_name.index('Kannur'))
-        self.label_4.setText(_translate("Dialog", "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Developed</span><span style=\" font-weight:600;\">: Akhil</span></p><p><span style=\" font-weight:600;\">developmentuse009@gmail.com</span></p><p><span style=\" font-weight:600; text-decoration: underline;\">Data</span><span style=\" font-weight:600;\">: </span><a href=\"https://api.covid19india.org/\"><span style=\" font-weight:600; text-decoration: underline; color:#0000ff;\">api.covid19india.org</span></a></p></body></html>", None))
+        self.label_4.setText(_translate("Dialog", "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Developed</span><span style=\" font-weight:600;\">: Akhil</span></p><p><span style=\" font-weight:600;\">MadeWithPY009@gmail.com</span></p><p><span style=\" font-weight:600; text-decoration: underline;\">Data</span><span style=\" font-weight:600;\">: </span><a href=\"https://api.covid19india.org/\"><span style=\" font-weight:600; text-decoration: underline; color:#0000ff;\">api.covid19india.org</span></a></p></body></html>", None))
 
 
 if __name__ == "__main__":
