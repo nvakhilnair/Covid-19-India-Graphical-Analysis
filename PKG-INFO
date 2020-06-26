@@ -1,0 +1,29 @@
+Metadata-Version: 2.1
+Name: covid_19_graphical_analysis
+Version: 1.0.4
+Summary: Gui application is used for Analysis of Covid-19 in India Graphical (cmd command: covid_19_graphical_analysis.py)
+Home-page: https://github.com/nvakhilnair/Covid-19-India-Graphical-Analysis
+Author: Akhil
+Author-email: MadeWithPY009@gmail.com
+License: MIT
+Description: Gui application is used for Analysis of Covid-19 in India Graphical.
+        This application lets you get current status,daily analysis of last 15 days and daily test count of India(States and Districs included)
+        
+        cmd command : covid_19_graphical_analysis.py (after pip installation the package)
+        		*always use file extension .py in command terminal to run
+        
+        Requirement: PyQt4==4.11.4
+        	     pandas==1.0.3
+        *You can also manually install these libraries using <pip install pandas>  <pip install PyQt4>
+        or use Requirements.txt file using <pip install -r Requirements.txt>
+        
+        
+        Feedbacks and suggestions for improvement are always welcomed
+        email id: MadeWithPY009@gmail.com 
+        
+        
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Description-Content-Type: text/markdown
