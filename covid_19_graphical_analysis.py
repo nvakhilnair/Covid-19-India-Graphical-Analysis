@@ -57,9 +57,9 @@ class Ui_Dialog(QWidget):
         Dialog.resize(694, 513)
         Dialog.setAutoFillBackground(False)
         Dialog.setStyleSheet(
-            "QWidget#Dialog {background-image: url(logo.png);background-repeat: no-repeat; background-position: center;}")
+            "QWidget#Dialog {background-image: url('data/logo.png');background-repeat: no-repeat; background-position: center;}")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8("icon.ico")),
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("data\icon.ico")),
                        QtGui.QIcon.Normal, QtGui.QIcon.Off)
         Dialog.setWindowIcon(icon)
         self.line = QtGui.QFrame(Dialog)
