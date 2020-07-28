@@ -7,6 +7,7 @@ from datetime import date, timedelta
 import datetime
 import sys
 from PyQt4.QtGui import QMessageBox
+import numpy as np
 try:
     global state_wise
     global case_time_series
@@ -14,6 +15,7 @@ try:
     global state_wise_daily
     global statewise_tested_number_data
     global state_district_wise
+    global state_district
     state_wise = pd.read_csv(
         "https://api.covid19india.org/csv/latest/state_wise.csv")
     case_time_series = pd.read_csv(
@@ -26,6 +28,7 @@ try:
         'https://api.covid19india.org/csv/latest/statewise_tested_numbers_data.csv')
     state_district_wise = pd.read_csv(
         'https://api.covid19india.org/csv/latest/district_wise.csv')
+    state_district = pd.read_csv('https://api.covid19india.org/csv/latest/districts.csv')
 except:
     application = QtGui.QApplication(sys.argv)
     QMessageBox.information(None, 'Error', 'No Network Connection',
@@ -54,7 +57,7 @@ except AttributeError:
 class Ui_Dialog(QWidget):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
-        Dialog.resize(694, 513)
+        Dialog.resize(700, 530)
         Dialog.setAutoFillBackground(False)
         Dialog.setStyleSheet(
             "QWidget#Dialog {background-image: url('data/logo.png');background-repeat: no-repeat; background-position: center;}")
@@ -128,9 +131,13 @@ class Ui_Dialog(QWidget):
         self.Statecomparison.setObjectName(_fromUtf8("Statecomparison"))
         self.Statecomparison.clicked.connect(self.state_comparision)
         self.districtStatus = QtGui.QPushButton(Dialog)
-        self.districtStatus.setGeometry(QtCore.QRect(270, 460, 181, 23))
+        self.districtStatus.setGeometry(QtCore.QRect(150, 460, 120, 23))
         self.districtStatus.setObjectName(_fromUtf8("districtStatus"))
         self.districtStatus.clicked.connect(self.district_status)
+        self.daily_districtStatus = QtGui.QPushButton(Dialog)
+        self.daily_districtStatus.setGeometry(QtCore.QRect(290, 460, 120, 23))
+        self.daily_districtStatus.setObjectName(_fromUtf8("daily_districtStatus"))
+        self.daily_districtStatus.clicked.connect(self.daily_district_status)
         self.comboBox = QtGui.QComboBox(Dialog)
         self.comboBox.setGeometry(QtCore.QRect(20, 200, 121, 22))
         self.comboBox.setEditable(False)
@@ -150,11 +157,11 @@ class Ui_Dialog(QWidget):
         self.comboBox_4.setObjectName(_fromUtf8("comboBox_4"))
         self.comboBox_4.addItem(_fromUtf8(""))
         self.comboBox_5 = QtGui.QComboBox(Dialog)
-        self.comboBox_5.setGeometry(QtCore.QRect(100, 460, 131, 22))
+        self.comboBox_5.setGeometry(QtCore.QRect(6, 460, 131, 22))
         self.comboBox_5.setObjectName(_fromUtf8("comboBox_5"))
         self.comboBox_5.addItem(_fromUtf8(""))
         self.label_4 = QtGui.QLabel(Dialog)
-        self.label_4.setGeometry(QtCore.QRect(510, 420, 151, 71))
+        self.label_4.setGeometry(QtCore.QRect(510, 420, 180, 71))
         self.label_4.setObjectName(_fromUtf8("label_4"))
         self.retranslateUi(Dialog)
         self.comboBox.setCurrentIndex(0)
@@ -187,95 +194,62 @@ class Ui_Dialog(QWidget):
 
     def daily_status_plot(self):
         data = case_time_series.copy()
-        Confirmed = []
-        Recovered = []
-        Deceased = []
-        Date = []
-        for i in range(0, 15):
-            temp = data.tail(15).iloc[i, 0]
-            Date.append(temp)
-            temp = data.tail(15).iloc[i, 1]
-            Confirmed.append(temp)
-            temp = data.tail(15).iloc[i, 3]
-            Recovered.append(temp)
-            temp = data.tail(15).iloc[i, 5]
-            Deceased.append(temp)
+        Daily_Confirmed=data['Daily Confirmed'].tail(15)
+        Daily_Recovered=data['Daily Recovered'].tail(15)
+        Daily_Deceased=data['Daily Deceased'].tail(15)
+        date=data['Date'].tail(15) 
         plt.rcParams["figure.figsize"] = (10, 8)
         plt.rc('xtick', labelsize=8)
         plt.rc('ytick', labelsize=8)
-        plt.plot(Date, Confirmed, marker='o')
-        plt.plot(Date, Recovered, marker='o')
-        plt.plot(Date, Deceased, marker='o')
+        plt.plot(date, Daily_Confirmed, marker='o')
+        plt.plot(date, Daily_Recovered, marker='o')
+        plt.plot(date, Daily_Deceased, marker='o')
         plt.title("Covid-19 India: Last 15 days Status")
         plt.xlabel('Date')
         plt.ylabel('Number of people')
         plt.legend(["Confirmed", "Recovered", "Deceased"])
         plt.grid(True)
-        for a, b in zip(Date, Confirmed):
+        for a, b in zip(date, Daily_Confirmed):
             plt.text(a, b, str(b))
-        for a, b in zip(Date, Recovered):
+        for a, b in zip(date, Daily_Recovered):
             plt.text(a, b, str(b))
-        for a, b in zip(Date, Deceased):
+        for a, b in zip(date, Daily_Deceased):
             plt.text(a, b, str(b))
         plt.show()
 
     def test_to_positive_rate(self):
         data = tested_number_icmr_data.copy()
-        data.rename(columns={"Update Time Stamp": "Date"}, inplace=True)
-        data['Date'] = pd.to_datetime(
-            data['Date'], dayfirst=True, yearfirst=False).dt.date
         data1 = case_time_series.copy()
-        data1['Date'] = data1['Date'].map('{}2020'.format)
-        data1['Date'] = pd.to_datetime(
-            data1['Date'], dayfirst=True, yearfirst=False).dt.date
-        temp_date = data.tail(17).iloc[0, 0]
-        temp_data = int(data[data['Date'] == temp_date].iloc[:, 1])
-        temp_data1 = int(data1[data1['Date'] == temp_date].iloc[:, 2])
-        Date = []
-        test = []
-        con = []
-        rate = []
-        for i in range(0, 15):
-            x = data1.tail(15).iloc[i, 0]
-            y = str(x)
-            y = y[5:]
-            Date.append(y)
-            temp = int(data[data['Date'] == x].iloc[:, 1])
-            new_temp = temp
-            temp = temp-temp_data
-            temp_data = new_temp
-            test.append(temp)
-            temp = int(data1[data1['Date'] == x].iloc[:, 2])
-            new_temp1 = temp
-            temp = temp-temp_data1
-            temp_data1 = new_temp1
-            con.append(temp)
-            temp = (con[i]/test[i])*100
-            temp = round(temp, 2)
-            rate.append(temp)
+        daily_tested = -(data['Total Samples Tested'].tail(16) - data['Total Samples Tested'].tail(16).shift(-1))
+        daily_tested=daily_tested[:-1]
+        daily_confirmed=data1['Daily Confirmed'].tail(15)
+        date=data1['Date'].tail(15)
         plt.rcParams["figure.figsize"] = (10, 8)
         plt.rc('xtick', labelsize=8)
         plt.rc('ytick', labelsize=8)
-        plt.plot(Date, test, marker='o')
-        plt.plot(Date, con, marker='o')
+        plt.plot(date, daily_tested, marker='o')
+        plt.plot(date, daily_confirmed, marker='o')
         plt.xlabel('Date')
         plt.title('Covid-19 India: Last 15 days Number of Tests to Positive Case')
-        plt.legend(["Daily Test Count", "Daily Positive Case"])
+        plt.legend(["Daily Test Count", "Daily Positive Cases"])
         plt.grid(True)
-        for a, b in zip(Date, test):
+        for a, b in zip(date, daily_tested):
             plt.text(a, b, str(b))
-        for a, b in zip(Date, con):
+        for a, b in zip(date, daily_confirmed):
             plt.text(a, b, str(b))
         plt.show()
+        x=np.array(daily_confirmed)
+        y=np.array(daily_tested)
+        rate=np.round(((x/y)*100),2)
         plt.rc('xtick', labelsize=8)
         plt.rc('ytick', labelsize=8)
-        plt.plot(Date, rate, marker='o')
+        plt.plot(date, rate, marker='o')
         plt.title('Covid-19 India: Test Positive Rate %')
         plt.xlabel('Date')
         plt.ylabel('%Rate')
         plt.legend(["Test Positive Rate"])
         plt.grid(True)
-        for a, b in zip(Date, rate):
+        for a, b in zip(date, rate):
             plt.text(a, b, str(b))
         plt.show()
 
@@ -291,41 +265,30 @@ class Ui_Dialog(QWidget):
             code = ''.join([str(elem) for elem in temp])
             data = state_wise_daily.copy()
             data.rename(columns={code: "code"}, inplace=True)
-            Confirmed = []
-            Recovered = []
-            deaths = []
-            for i in range(0, 15):
-                temp = data[data['Status'] == 'Confirmed'].tail(
-                    15).code.iloc[i]
-                Confirmed.append(temp)
-                temp = data[data['Status'] == 'Recovered'].tail(
-                    15).code.iloc[i]
-                Recovered.append(temp)
-                temp = data[data['Status'] == 'Deceased'].tail(15).code.iloc[i]
-                deaths.append(temp)
-            today = datetime.date.today()
-            Date = []
-            for i in range(15, 0, -1):
-                x = str(today - datetime.timedelta(days=i))
-                x = x[5:]
-                Date.append(x)
-            plt.rcParams["figure.figsize"] = (12, 12)
+            Confirmed = data[data['Status'] == 'Confirmed'].tail(
+                15).code
+            Recovered = data[data['Status'] == 'Recovered'].tail(
+                15).code
+            deaths = data[data['Status'] == 'Deceased'].tail(15).code
+            date=data[data['Status'] == 'Confirmed'].tail(
+                    15).Date
+            plt.rcParams["figure.figsize"] = (15, 8)
             plt.rc('xtick', labelsize=8)
             plt.rc('ytick', labelsize=8)
-            plt.plot(Date, Confirmed, marker='o')
-            plt.plot(Date, Recovered, marker='o')
-            plt.plot(Date, deaths, marker='o')
+            plt.plot(date, Confirmed, marker='o')
+            plt.plot(date, Recovered, marker='o')
+            plt.plot(date, deaths, marker='o')
             plt.legend(["Confirmed", "Recovered", "Deceased"])
             plt.xlabel('Date')
             plt.ylabel('Number of people')
             plt.grid(True)
             title = ('Covid-19 ' + state + ': Last 15 Day Status')
             plt.title(title)
-            for a, b in zip(Date, Confirmed):
+            for a, b in zip(date, Confirmed):
                 plt.text(a, b, str(b))
-            for a, b in zip(Date, Recovered):
+            for a, b in zip(date, Recovered):
                 plt.text(a, b, str(b))
-            for a, b in zip(Date, deaths):
+            for a, b in zip(date, deaths):
                 plt.text(a, b, str(b))
             plt.show()
         except:
@@ -364,36 +327,17 @@ class Ui_Dialog(QWidget):
         try:
             state = self.comboBox.currentText()
             data = statewise_tested_number_data.copy()
-            data.rename(columns={"Updated On": "Date"}, inplace=True)
             data.rename(columns={"Total Tested": "TotalTested"}, inplace=True)
-            temp_tested = int(
-                data[data['State'] == state].tail(17).TotalTested.iloc[0])
-            temp_positive = int(
-                data[data['State'] == state].tail(17).Positive.iloc[0])
-            Date = []
-            TT = []
-            PT = []
-            Rate = []
-            for i in range(0, 15):
-                tested = int(data[data['State'] == state].tail(
-                    16).TotalTested.iloc[i])
-                positive = int(
-                    data[data['State'] == state].tail(16).Positive.iloc[i])
-                x = str(data[data['State'] == state].tail(15).Date.iloc[i])
-                x = x[:5]
-                Date.append(x)
-                loc_tested = tested
-                loc_positive = positive
-                tested = tested-temp_tested
-                positive = positive-temp_positive
-                temp_tested = loc_tested
-                temp_positive = loc_positive
-                TT.append(tested)
-                PT.append(positive)
-                Rate.append(round(((positive/tested)*100), 2))
-            plt.rcParams["figure.figsize"] = (12, 12)
-            plt.plot(Date, TT, marker='o')
-            plt.plot(Date, PT, marker='o')
+            data.rename(columns={"Updated On": "Date"}, inplace=True)
+            daily_tested = -((data[data['State'] == state].tail(17).TotalTested) - (data[data['State'] == state].tail(17).TotalTested.shift(-1)))
+            daily_tested=daily_tested[:-2]
+            daily_confirmed = -((data[data['State'] == state].tail(17).Positive) - (data[data['State'] == state].tail(17).Positive.shift(-1)))
+            daily_confirmed=daily_confirmed[:-2]
+            date=data[data['State'] == state].tail(16).Date
+            date=date[:-1]
+            plt.rcParams["figure.figsize"] = (15, 8)
+            plt.plot(date, daily_tested, marker='o')
+            plt.plot(date, daily_confirmed, marker='o')
             plt.rc('xtick', labelsize=8)
             plt.rc('ytick', labelsize=8)
             title = "Covid-19 " + state + ": Last 15 days Testing to Corresponding Positive Count"
@@ -401,23 +345,26 @@ class Ui_Dialog(QWidget):
             plt.xlabel('Date')
             plt.legend(["Daily Tested", "Daily Positive"])
             plt.grid(True)
-            for a, b in zip(Date, TT):
+            for a, b in zip(date, daily_tested):
                 plt.text(a, b, str(b))
-            for a, b in zip(Date, PT):
+            for a, b in zip(date, daily_confirmed):
                 plt.text(a, b, str(b))
             plt.show()
-            plt.rcParams["figure.figsize"] = (12, 12)
+            x=np.array(daily_confirmed)
+            y=np.array(daily_tested)
+            rate=np.round(((x/y)*100),2)
+            plt.rcParams["figure.figsize"] = (15, 8)
             plt.rc('xtick', labelsize=8)
             plt.rc('ytick', labelsize=8)
-            plt.plot(Date, Rate, marker='o')
+            plt.plot(date, rate, marker='o')
             plt.legend(["Rate"])
-            title = "Covid-19" + state + ": Last 15 days Test to Postive Rate in Pencentage"
+            title = "Covid-19: " + state + ": Last 15 days Test to Postive Rate in Pencentage"
             plt.title(title)
             plt.xlabel('Date')
             plt.ylabel('%Rate')
-            for a, b in zip(Date, Rate):
+            for a, b in zip(date, rate):
                 plt.text(a, b, str(b))
-            plt.show()
+            plt.show()         
         except:
             error = QtGui.QMessageBox.critical(
                 self, 'Error', "Data insufficient for the selected state")
@@ -450,6 +397,36 @@ class Ui_Dialog(QWidget):
         plt.title(title)
         plt.show()
 
+
+    def daily_district_status(self):
+        try:
+            district = self.comboBox_5.currentText()
+            data=state_district.copy()
+            daily_confirmed = -(data[data['District']==district].tail(16).Confirmed - data[data['District']==district].tail(16).Confirmed.shift(-1))
+            daily_confirmed=daily_confirmed[:-1]
+            daily_Recovered = -(data[data['District']==district].tail(16).Recovered - data[data['District']==district].tail(16).Recovered.shift(-1))
+            daily_Recovered=daily_Recovered[:-1]
+            date=data[data['District']==district].tail(15).Date
+            plt.rcParams["figure.figsize"] = (15, 8)
+            plt.rc('xtick', labelsize=8)
+            plt.rc('ytick', labelsize=8)
+            plt.plot(date,daily_confirmed, marker='o')
+            plt.plot(date,daily_Recovered, marker='o')
+            plt.legend(["daily_confirmed","daily_Recovered"])
+            title = "Covid-19: " + district + ": Last 15 days status"
+            plt.title(title)
+            plt.xlabel('Date')
+            plt.ylabel('number of  people')
+            for a, b in zip(date, daily_confirmed):
+                plt.text(a, b, str(b))
+            for a, b in zip(date, daily_Recovered):
+                plt.text(a, b, str(b))
+            plt.show()
+        except:
+            error = QtGui.QMessageBox.critical(
+                self, 'Error', "Data insufficient for the selected district")
+
+            
     def state_comparision(self):
         try:
             state1 = self.comboBox_2.currentText()
@@ -668,7 +645,9 @@ class Ui_Dialog(QWidget):
         self.Statecomparison.setText(_translate(
             "Dialog", "Selected State Comparison", None))
         self.districtStatus.setText(_translate(
-            "Dialog", "Selected district Current Status", None))
+            "Dialog", "Current Status", None))
+        self.daily_districtStatus.setText(_translate(
+            "Dialog", "Daily Status", None))
         data = state_wise.copy()
         state_names = []
         for i in range(1, len(data)):
@@ -701,7 +680,7 @@ class Ui_Dialog(QWidget):
         self.comboBox_3.setCurrentIndex(state_names.index('Gujarat'))
         self.comboBox_4.setCurrentIndex(state_names.index('Karnataka'))
         self.comboBox_5.setCurrentIndex(district_name.index('Kannur'))
-        self.label_4.setText(_translate("Dialog", "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Developed</span><span style=\" font-weight:600;\">: Akhil</span></p><p><span style=\" font-weight:600;\">developmentuse009@gmail.com</span></p><p><span style=\" font-weight:600; text-decoration: underline;\">Data</span><span style=\" font-weight:600;\">: </span><a href=\"https://api.covid19india.org/\"><span style=\" font-weight:600; text-decoration: underline; color:#0000ff;\">api.covid19india.org</span></a></p></body></html>", None))
+        self.label_4.setText(_translate("Dialog", "<html><head/><body><p><span style=\" font-weight:600; text-decoration: underline;\">Developed</span><span style=\" font-weight:600;\">: Akhil</span></p><p><span style=\" font-weight:600;\">MadeWithPY009@gmail.com</span></p><p><span style=\" font-weight:600; text-decoration: underline;\">Data</span><span style=\" font-weight:600;\">: </span><a href=\"https://api.covid19india.org/\"><span style=\" font-weight:600; text-decoration: underline; color:#0000ff;\">api.covid19india.org</span></a></p></body></html>", None))
 
 
 if __name__ == "__main__":
